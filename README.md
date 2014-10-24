@@ -1,5 +1,5 @@
-DomainCrawler: Scraping expired .dk domains
-===========================================
+DomainCrawler: Expired .dk domains
+==================================
 
 This small Python script scrape crawlr.dk to check for expired .dk domains.
 
