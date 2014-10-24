@@ -1,10 +1,15 @@
 import cookielib
+import datetime
 import mechanize
 import re
+from pymongo import MongoClient
 
 br = mechanize.Browser()
 cj = cookielib.LWPCookieJar()
 br.set_cookiejar(cj)
+mc = MongoClient('localhost', 27017)
+db = mc.domains
+ed = db.expired_domains
 
 domain_re = re.compile(r'href="http://www\.crawlr\.dk/domain/(.*\.dk)"')
 
@@ -24,5 +29,8 @@ br.open('http://www.crawlr.dk/deleted/date/365')
 for i in range(0, 100000, 100):
     results = crawl(i)
     for d in results:
-        if len(d) <= 5:
+        if len(d) <= 6:
             print d
+            domain = {'domain': d,
+                      'found': datetime.datetime.now()}
+            ed.insert(domain)
