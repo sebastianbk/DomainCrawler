@@ -5,28 +5,27 @@ import re
 from pymongo import MongoClient
 
 br = mechanize.Browser()
+br.set_handle_robots(False)
+br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
 cj = cookielib.LWPCookieJar()
 br.set_cookiejar(cj)
 mc = MongoClient('localhost', 27017)
 db = mc.domains
 ed = db.expired_domains
 
-domain_re = re.compile(r'href="http://www\.crawlr\.dk/domain/(.*\.dk)"')
+domain_re = re.compile(r'href="/domain/(.*\.dk)"')
 
 def crawl(pageid):
-    if pageid == 0:
-        url = 'http://www.crawlr.dk/deleted'
-    else:
-        url = 'http://www.crawlr.dk/deleted/' + str(pageid)
+    url = 'http://www.crawlr.dk/deleted/?range=365&page=' + str(pageid)
     print url
 
     page = br.open(url).read()
     domains = domain_re.findall(page)
     return list(set(domains))
 
-br.open('http://www.crawlr.dk/deleted/date/365')
+br.open('https://www.crawlr.dk/deleted/?range=365')
 
-for i in range(0, 100000, 100):
+for i in range(1, 100000):
     results = crawl(i)
     for d in results:
         if len(d) <= 6:
